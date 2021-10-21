@@ -2,97 +2,59 @@
 # Distributed under the terms of the Modified BSD License.
 
 # JupyterHub docker-compose configuration file
-version:                          "2.3"
+version: "2.3"
 
 services:
-  hub:
-    depends_on:
-      - hub-db
+  jupyter:
     build:
-      context:                    .
-      dockerfile:                 Dockerfile.jupyterhub
-      args:
-        JUPYTERHUB_VERSION:       ${JUPYTERHUB_VERSION}
-    restart:                      always
-    image:                        jupyterhub
-    runtime:                      nvidia
-    container_name:               jupyterhub
-
+      context: .
+    image: jupyterhub
+    container_name: jupyterhub  # necessary so spawned containers can reach hub
+    depends_on:
+      - jupyter-db
+    restart: unless-stopped
+    runtime: nvidia
     volumes:
-      # use a volume mapping into the container if you like
-      - "/notebook_dir:${DOCKER_NOTEBOOK_DIR}"
-      # Bind Docker socket on the host so we can connect to the daemon from
-      # within the container
       - "/var/run/docker.sock:/var/run/docker.sock:rw"
-      # Bind Docker volume on host for JupyterHub database and cookie secrets
-      - "data:${DATA_VOLUME_CONTAINER}"
-      # and now a place for all your giant ML data---change to suit your install
-      - "/path/to/data:/ml_data"
-
+      # volume for Jupyter Hub database and cookie secrets
+      - "jupyter-data:/data"
+      # configs
+      - "./data/configs/:/srv/jupyterhub/"
+    networks:
+      - default
+      - jupyter-network
     ports:
-      - "443:443"
-    links:
-      - hub-db
+      - 8080:80
     environment:
-      # this is just to show how to use with self signed keys use which ever you like
-      SSL_KEY:                   ${SSL_KEY}
-      SSL_CERT:                  ${SSL_CERT}
-      # All containers will join this network
-      DOCKER_NETWORK_NAME:        ${DOCKER_NETWORK_NAME}
+      JUPYTER_ENABLE_LAB: "yes"
       # JupyterHub will spawn this Notebook image for users
-      DOCKER_NOTEBOOK_IMAGE:      ${LOCAL_NOTEBOOK_IMAGE}
-      # Notebook directory inside user image
-      DOCKER_NOTEBOOK_DIR:        ${DOCKER_NOTEBOOK_DIR}
-      # data dir inside the user image
-      DOCKER_SHARED_DATA_DIR:     ${DOCKER_SHARED_DATA_DIR}
-      # Using this run command (optional)
-      DOCKER_SPAWN_CMD:           ${DOCKER_SPAWN_CMD}
-      CONFIGPROXY_AUTH_TOKEN:     ${CONFIGPROXY_AUTH_TOKEN}
-      ## needed for nvidia-docker version 2
-      NVIDIA_VISIBLE_DEVICES:     all
+      DOCKER_NOTEBOOK_IMAGE: hub-deep-learning-notebook-gpu
+      # specify how GPUs are exposed to containers
+      NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
       # Postgres db info
-      POSTGRES_DB:                ${POSTGRES_DB}
-      POSTGRES_HOST:              hub-db
-      POSTGRES_PASSWORD:          ${POSTGRES_PASSWORD}
-    command:                      >
+      POSTGRES_DB: jupyterhub
+      POSTGRES_HOST: jupyterhub-db
+      # use `openssl rand -hex 32` to generate, and copy it down below
+      POSTGRES_PASSWORD: changeme
+    command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
-      
-  # postgres database
-  hub-db:
-    image:                        postgres:9.5
-    container_name:               jupyterhub-db
-    restart:                      always
+  jupyter-db:
+    image: postgres:9.5
+    restart: unless-stopped
+    container_name: jupyterhub-db
+    networks:
+      - jupyter-network
     environment:
-      POSTGRES_DB:                ${POSTGRES_DB}
-      PGDATA:                     ${DB_VOLUME_CONTAINER}
-      POSTGRES_PASSWORD:          ${POSTGRES_PASSWORD}
-    # I have the postgres related settings stored in the .env file but you could store them here or in a docker volume using dockersecrets
-    #env_file:
-      #- secrets/postgres.env
+      POSTGRES_DB: jupyterhub
+      POSTGRES_PASSWORD: changeme
     volumes:
-      - "db:${DB_VOLUME_CONTAINER}"
-
-  #PHP-Adminer
-  adminer:
-    links:
-      - hub-db
-    image:                        clue/adminer:latest
-    ports:
-      - 7000:80
-
+      - "jupyter-db:/var/lib/postgresql/data"
 
 networks:
   default:
-    external:
-      name:                       ${DOCKER_NETWORK_NAME} ## need to be created first IE `docker network create $NETWORK_NAME`
-
-
+  jupyter-network:
+    name: jupyter-network  # specified so that spawned containers can join
 volumes:
-  data:
-    external:
-      name:                       ${DATA_VOLUME_HOST} ## need to be created first IE `docker volume create --name=$VOLUME_NAME`
-
-  db:
-    external:
-      name:                       ${DB_VOLUME_HOST} ## need to be created first IE `docker volume create --name=$VOLUME_NAME`
+  jupyter-data:
+  jupyter-db:

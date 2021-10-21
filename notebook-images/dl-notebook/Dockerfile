@@ -3,13 +3,14 @@
 
 FROM base-notebook-gpu
 
-MAINTAINER Samir Jabari <samir.jabari@fau.de>
+MAINTAINER Kyle Roth <kylrth@gmail.com>
+#MAINTAINER Samir Jabari <samir.jabari@fau.de>
 #MAINTAINER aburnap@mit.edu
 #MAINTAINER Jupyter Project <jupyter@googlegroups.com>
 
 USER root
 
-# Install all OS dependencies for fully functional notebook server
+# OS dependencies
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     git \
@@ -71,13 +72,16 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     libvips \
     libvips-dev \
-    libvips-tools \ 
+    libvips-tools \
     texlive-latex-extra \
-    dvipng  && \
+    dvipng
+
+RUN apt-get autoremove -y && \
+    apt-get autoclean && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN conda install --yes\
+RUN conda install --yes \
     Pillow \
     h5py \
     ipykernel \
@@ -102,42 +106,46 @@ RUN conda install --yes\
     tqdm \
     statsmodels \
     pydicom \
-    tensorboardX \
-    tensorflow-tensorboard \
     plotly \
-    ipython \
-    tensorflow-gpu && \
-    fix-permissions $CONDA_DIR
+    ipython
 
-# Installing pytorch
-RUN conda install pytorch torchvision cudatoolkit=10.0 -c pytorch && \
-    conda clean -tipsy && \
-    fix-permissions $CONDA_DIR
+# install Pytorch (force CUDA version even if building with default runtime)
+RUN conda install --yes \
+    pytorch=*=*cuda* \
+    torchvision \
+    torchaudio \
+    cudatoolkit=11.1 \
+    -c pytorch -c nvidia
 
-# Installing OpenCV
-RUN conda install opencv -c conda-forge && \
-    fix-permissions $CONDA_DIR
+# # install TensorFlow (force GPU-enabled version)
+# RUN conda install --yes \
+#     tensorflow=*=*gpu* \
+#     tensorboardX \
+#     tensorflow-tensorboard
 
-RUN python3.6 -m pip install --upgrade --no-cache-dir \
+# install OpenCV
+RUN conda install opencv -c conda-forge
+
+RUN conda clean -tipsy && fix-permissions $CONDA_DIR
+
+RUN python -m pip install --upgrade --no-cache-dir \
     zmq \
     imgaug \
     kaggle \
     pretrainedmodels \
     torchsummary \
-    skorch && \
+    skorch
+RUN python -m pip install --upgrade --no-cache-dir --ignore-installed  --pre \
+    jupyter-tensorboard && \
     fix-permissions /home/$NB_USER
 
-RUN python3.6 -m pip install --upgrade --no-cache-dir --ignore-installed  --pre \
-    jupyter-tensorboard &&\
-    fix-permissions /home/$NB_USER
-
-
-ENV CUDA_HOME /usr/local/cuda-10.0
-ENV LD_LIBRARY_PATH /usr/local/cuda-10.0:/usr/local/cuda-10.0/lib64:$LD_LIBRARY_PATH
-ENV LD_LIBRARY_PATH /usr/local/cuda/extras/CUPTI/lib64:$LD_LIBRARY_PATH
+ENV CUDA_HOME /usr/local/cuda-11.4
+ENV LD_LIBRARY_PATH /usr/local/cuda-11.4:/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH
+# CUPTI libs were moved to /usr/local/cuda/lib64
+ENV LD_LIBRARY_PATH /usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV LIBRARY_PATH $LD_LIBRARY_PATH
 
-# Install facets which does not have a pip or conda package at the moment
+# install facets which does not have a pip or conda package at the moment
 RUN cd /tmp && \
     git clone https://github.com/PAIR-code/facets.git && \
     cd facets && \
@@ -145,18 +153,19 @@ RUN cd /tmp && \
     rm -rf facets && \
     fix-permissions $CONDA_DIR
 
-# Import matplotlib the first time to build the font cache.
+# import matplotlib the first time to build the font cache
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
+    fix-permissions /home/$NB_USER
+
+# clean up any temporary data
+RUN rm -rf /tmp/* /var/tmp/*
+
+# create working directories beforehand
+RUN mkdir /home/$NB_USER/persistent && \
+    mkdir /home/$NB_USER/shared && \
     fix-permissions /home/$NB_USER
 
 EXPOSE 5000 6006
 
 USER $NB_USER
-
-
-# cleanup
- #RUN 	apt-get autoremove -y && \
-  # apt-get autoclean && \
-  # apt-get clean && \
- #rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*

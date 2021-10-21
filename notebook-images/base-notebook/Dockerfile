@@ -1,13 +1,10 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-# Ubuntu 16.04 (xenial)
-# https://gitlab.com/nvidia/cuda/blob/ubuntu16.04/9.1/devel/cudnn7/Dockerfile
+FROM nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04
 
-
-FROM nvidia/cuda:10.0-cudnn7-devel-ubuntu18.04
-
-MAINTAINER Samir Jabari <samir.jabari@fau.de>
+MAINTAINER Kyle Roth <kylrth@gmail.com>
+# MAINTAINER Samir Jabari <samir.jabari@fau.de>
 
 USER root
 
@@ -34,8 +31,10 @@ RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && \
     locale-gen
 
 # Install Tini
-RUN wget --quiet https://github.com/krallin/tini/releases/download/v0.10.0/tini && \
-    echo "1361527f39190a7338a0b434bd8c88ff7233ce7b9a4876f3315c22fce7eca1b0 *tini" | sha256sum -c - && \
+ENV TINI_VERSION 0.19.0
+ENV TINI_SHA256 93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c
+RUN wget --quiet https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini && \
+    echo "${TINI_SHA256} *tini" | sha256sum -c - && \
     mv tini /usr/local/bin/tini && \
     chmod +x /usr/local/bin/tini
 
@@ -63,10 +62,11 @@ RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
 USER $NB_USER
 
 # Install conda as Deep_Learner and check the md5 sum provided on the download site
-ENV MINICONDA_VERSION 4.5.11
+ENV MINICONDA_VERSION 4.7.12.1
+ENV MINICONDA_MD5 81c773ff87af5cfac79ab862942ab6b3
 RUN cd /tmp && \
     wget --quiet https://repo.continuum.io/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "e1045ee415162f944b6aebfe560b8fee *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
+    echo "${MINICONDA_MD5} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
     /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
     rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
     $CONDA_DIR/bin/conda config --system --prepend channels conda-forge && \
@@ -77,20 +77,15 @@ RUN cd /tmp && \
     fix-permissions $CONDA_DIR
 
 
-# Install Python, Jupyter Notebook and Hub
+# Install Python, Jupyter Notebook, and Jupyter Hub
 RUN conda install -y \
-    'python=3.6'  \
-    'notebook=5.6.*' \
-    'jupyterhub=1.0.*' \
-    'jupyterlab' \
+    'python'  \
+    'notebook=6.4.3' \
+    'jupyterhub=1.4.2' \
+    'jupyterlab=3.1.7' \
     'jupyter' \
     'six' &&\
     fix-permissions $CONDA_DIR
-
-# Setup work directory for backward-compatibility
-RUN mkdir /home/$NB_USER/work && \
-    mkdir /home/$NB_USER/data && \ 
-    fix-permissions /home/$NB_USER
 
 USER root
 

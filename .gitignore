@@ -1,4 +1,0 @@
-# never upload certificates or private keys
-*.pem
-*.crt
-*.key
