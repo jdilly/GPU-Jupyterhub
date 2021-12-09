@@ -158,6 +158,15 @@ ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
 RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
     fix-permissions /home/$NB_USER
 
+# install a few useful Ubuntu tools
+RUN apt-get update && apt-get install -y \
+    tmux \
+    less
+RUN apt-get autoremove -y && \
+    apt-get autoclean && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 # clean up any temporary data
 RUN rm -rf /tmp/* /var/tmp/*
 
