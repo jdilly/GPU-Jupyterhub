@@ -3,6 +3,7 @@
 
 # configuration file for JupyterHub
 import os
+
 c = get_config()
 
 # use the following command to generate a token, place it in the string below:
@@ -26,15 +27,18 @@ c.DockerSpawner.debug = True
 c.DockerSpawner.remove = True
 
 # these directories show up in each user's instance. They will be backed by folders on the host.
-notebook_dir= "/home/Deep_Learner/persistent"
-data_dir = "/home/Deep_Learner/shared"
+notebook_dir= "/home/deep/persistent"
+data_dir = "/home/deep/shared"
+lab_config_dir = "/home/deep/.jupyter/lab/user-settings"
 c.DockerSpawner.notebook_dir = notebook_dir
 c.DockerSpawner.volumes = {
     # NOTE: these are paths ON THE HOST, not on the hub container
     # mount the container notebook directory to a real directory on the host
     '/path/on/HOST/to/user_data/{username}': notebook_dir,
     # make the shared data dir available too
-    '/path/on/HOST/to/shared_data/': data_dir
+    '/path/on/HOST/to/shared_data/': data_dir,
+    # preserve Jupyter Lab settings across restarts
+    "/path/on/HOST/to/user_configs/{username}": lab_config_dir
 }
 
 # spawned containers will access the hub by container name on the Docker network

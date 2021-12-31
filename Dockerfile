@@ -1,6 +1,6 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
-FROM jupyterhub/jupyterhub:1.4.2
+FROM jupyterhub/jupyterhub:2.0.1
 
 # newer versions of Jupyter Hub don't have conda, and we need conda to install psycopg2 without
 # building (which requires other postgres stuff to be installed)

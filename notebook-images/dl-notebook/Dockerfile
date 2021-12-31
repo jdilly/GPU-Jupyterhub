@@ -4,177 +4,152 @@
 FROM base-notebook-gpu
 
 MAINTAINER Kyle Roth <kylrth@gmail.com>
-#MAINTAINER Samir Jabari <samir.jabari@fau.de>
-#MAINTAINER aburnap@mit.edu
-#MAINTAINER Jupyter Project <jupyter@googlegroups.com>
 
 USER root
 
-# OS dependencies
+ARG DEBIAN_FRONTEND=noninteractive
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    ant \
+    bc \
     build-essential \
-    git \
+    cmake \
     curl \
+    default-jdk \
+    doxygen \
+    dvipng \
+    ffmpeg \
     freeglut3-dev \
-    libcupti-dev \
-    libcurl3-dev \
-    libfreetype6-dev \
-    libzmq3-dev \
-    pkg-config \
-    unzip \
-    rsync \
+    gfortran \
+    git \
+    gnupg2 \
+    g++ \
     inkscape \
     jed \
-    libsm6 \
-    libxext-dev \
-    libxrender1 \
-    lmodern \
-    pandoc \
-    vim \
-    libpng-dev \
-    g++ \
-    gfortran \
-    libgl1-mesa-glx \
-    libffi-dev \
-    libhdf5-dev \
-    libjpeg-dev \
-    liblcms2-dev \
-    libopenblas-dev \
-    liblapack-dev \
-    libssl-dev \
-    libtiff5-dev \
-    libwebp-dev \
-    nano \
-    zlib1g-dev \
-    qt5-default \
-    libvtk6-dev \
-    libopenexr-dev \
-    libdc1394-22-dev \
+    less \
     libavcodec-dev \
     libavformat-dev \
-    libswscale-dev \
-    libtheora-dev \
-    libvorbis-dev \
-    libxvidcore-dev \
-    libx264-dev \
-    yasm \
+    libcupti-dev \
+    libcurl3-dev \
+    libdc1394-22-dev \
+    libeigen3-dev \
+    libffi-dev \
+    libfreetype6-dev \
+    libgl1-mesa-glx \
+    libhdf5-dev \
+    libjpeg-dev \
+    liblapack-dev \
+    liblcms2-dev \
+    libopenblas-dev \
     libopencore-amrnb-dev \
     libopencore-amrwb-dev \
-    libv4l-dev \
-    libxine2-dev \
+    libopenexr-dev \
+    libpng-dev \
+    libsm6 \
+    libssl-dev \
+    libswscale-dev \
     libtbb-dev \
-    libeigen3-dev \
-    ant \
-    default-jdk \
-    bc \
-    cmake \
-    doxygen \
-    ffmpeg \
+    libtheora-dev \
+    libtiff5-dev \
+    libv4l-dev \
     libvips \
     libvips-dev \
     libvips-tools \
+    libvorbis-dev \
+    libvtk6-dev \
+    libwebp-dev \
+    libx264-dev \
+    libxext-dev \
+    libxine2-dev \
+    libxrender1 \
+    libxvidcore-dev \
+    libzmq3-dev \
+    lmodern \
+    openssh-client \
+    pandoc \
+    pkg-config \
+    qt5-default \
+    rsync \
     texlive-latex-extra \
-    dvipng
+    tmux \
+    unzip \
+    vim \
+    yasm \
+    zlib1g-dev
 
 RUN apt-get autoremove -y && \
     apt-get autoclean && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-RUN conda install --yes \
-    Pillow \
-    h5py \
-    ipykernel \
-    matplotlib \
-    seaborn \
-    numpy \
-    pandas \
-    scipy \
-    sympy \
-    nose \
-    setuptools \
-    tk \
-    bcolz \
-    Cython \
-    path.py \
-    sphinx \
-    wheel \
-    pygments \
-    Flask \
-    scikit-image \
-    scikit-learn \
-    tqdm \
-    statsmodels \
-    pydicom \
-    plotly \
-    ipython
+ARG NB_USER=deep \
+    NB_UID=1000 \
+    NB_GID=100
+USER $NB_USER
+
+# install Go and leave the update-golang.sh command available for the user
+ARG GOVERSION=1.17.5
+RUN git clone https://github.com/udhos/update-golang
+USER root
+RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
+# We won't run with sudo here to avoid providing the password, so we'll modify the script so it can
+# run as root.
+RUN cd /home/$NB_USER/update-golang && sed -i 's|$SUDO_USER|'"$NB_USER"'|' update-golang.sh
+RUN cd /home/$NB_USER/update-golang && sed -i 's|$SUDO_UID|'"$NB_UID"'|' update-golang.sh
+RUN cd /home/$NB_USER/update-golang && sed -i 's|$SUDO_GID|'"$NB_GID"'|' update-golang.sh
+RUN cd /home/$NB_USER/update-golang && RELEASE=$GOVERSION ./update-golang.sh -declutter
+RUN cd /home/$NB_USER/update-golang && git reset --hard
+USER $NB_USER
+
+ENV SHELL=/bin/bash \
+    EDITOR=vim
 
 # install Pytorch (force CUDA version even if building with default runtime)
 RUN conda install --yes \
-    pytorch=*=*cuda* \
-    torchvision \
-    torchaudio \
-    cudatoolkit=11.1 \
+    pytorch=1.10.1=*cuda* \
+    cudatoolkit=11.3.1 \
     -c pytorch -c nvidia
+# install TensorFlow
+RUN conda install --yes \
+    tensorflow-gpu=2.6.0
+# version other important data science packages
+RUN conda install --yes \
+    scikit-image=0.18.3 \
+    scikit-learn=1.0.1 \
+    scipy=1.7.1 \
+    matplotlib=3.5.0
+# no need to version these other things, but we will add them after the others so we get the latest
+# when the cache is busted
+RUN conda install --yes \
+    black \
+    Cython \
+    Flask \
+    h5py \
+    ipykernel \
+    ipython \
+    nose \
+    numpy \
+    pandas \
+    path.py \
+    Pillow \
+    pyyaml \
+    seaborn \
+    setuptools \
+    statsmodels \
+    tqdm \
+    wheel
 
-# # install TensorFlow (force GPU-enabled version)
-# RUN conda install --yes \
-#     tensorflow=*=*gpu* \
-#     tensorboardX \
-#     tensorflow-tensorboard
+RUN conda build purge-all
 
-# install OpenCV
-RUN conda install opencv -c conda-forge
-
-RUN conda clean -tipsy && fix-permissions $CONDA_DIR
-
-RUN python -m pip install --upgrade --no-cache-dir \
-    zmq \
-    imgaug \
-    kaggle \
-    pretrainedmodels \
-    torchsummary \
-    skorch
-RUN python -m pip install --upgrade --no-cache-dir --ignore-installed  --pre \
-    jupyter-tensorboard && \
-    fix-permissions /home/$NB_USER
-
-ENV CUDA_HOME /usr/local/cuda-11.4
-ENV LD_LIBRARY_PATH /usr/local/cuda-11.4:/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH
-# CUPTI libs were moved to /usr/local/cuda/lib64
-ENV LD_LIBRARY_PATH /usr/local/cuda/lib64:$LD_LIBRARY_PATH
-ENV LIBRARY_PATH $LD_LIBRARY_PATH
-
-# install facets which does not have a pip or conda package at the moment
-RUN cd /tmp && \
-    git clone https://github.com/PAIR-code/facets.git && \
-    cd facets && \
-    jupyter nbextension install facets-dist/ --sys-prefix && \
-    rm -rf facets && \
-    fix-permissions $CONDA_DIR
+RUN conda init bash
 
 # import matplotlib the first time to build the font cache
 ENV XDG_CACHE_HOME /home/$NB_USER/.cache/
-RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot" && \
-    fix-permissions /home/$NB_USER
-
-# install a few useful Ubuntu tools
-RUN apt-get update && apt-get install -y \
-    tmux \
-    less
-RUN apt-get autoremove -y && \
-    apt-get autoclean && \
-    apt-get clean && \
-    rm -rf /var/lib/apt/lists/*
+RUN MPLBACKEND=Agg python -c "import matplotlib.pyplot"
 
 # clean up any temporary data
+USER root
 RUN rm -rf /tmp/* /var/tmp/*
-
-# create working directories beforehand
-RUN mkdir /home/$NB_USER/persistent && \
-    mkdir /home/$NB_USER/shared && \
-    fix-permissions /home/$NB_USER
+USER $NB_USER
 
 EXPOSE 5000 6006
-
-USER $NB_USER
