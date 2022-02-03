@@ -27,10 +27,10 @@ c.DockerSpawner.debug = True
 c.DockerSpawner.remove = True
 
 # these directories show up in each user's instance. They will be backed by folders on the host.
+c.DockerSpawner.notebook_dir = "/home/deep"
 notebook_dir= "/home/deep/persistent"
 data_dir = "/home/deep/shared"
 lab_config_dir = "/home/deep/.jupyter/lab/user-settings"
-c.DockerSpawner.notebook_dir = notebook_dir
 c.DockerSpawner.volumes = {
     # NOTE: these are paths ON THE HOST, not on the hub container
     # mount the container notebook directory to a real directory on the host
