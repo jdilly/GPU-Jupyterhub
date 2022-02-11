@@ -14,6 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bc \
     build-essential \
     cmake \
+    cm-super \
     curl \
     default-jdk \
     doxygen \
