@@ -37,6 +37,8 @@ services:
       POSTGRES_HOST: jupyterhub-db
       # use `openssl rand -hex 32` to generate, and copy it down below
       POSTGRES_PASSWORD: changeme
+      GITHUB_CLIENT_ID: changeme
+      GITHUB_CLIENT_SECRET: changeme
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
   jupyter-db:

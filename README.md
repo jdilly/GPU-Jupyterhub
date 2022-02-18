@@ -9,4 +9,4 @@ This repo contains the docker-compose.yml for defining the dependencies to run a
 
 ## usage
 
-See my [blog post](https://kylrth.com/post/post/jupyter-lab/).
+See my [blog post](https://kylrth.com/post/jupyter-lab/).

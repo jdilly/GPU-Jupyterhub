@@ -18,8 +18,3 @@ RUN /opt/conda/bin/conda update -n root conda && \
         dockerspawner==12.1.0
 
 ENV PATH /opt/conda/bin:$PATH
-
-# TODO switch back to GitHub auth
-RUN useradd -m kyle && \
-    echo 'kyle:password' | chpasswd && \
-    chown kyle /home/kyle

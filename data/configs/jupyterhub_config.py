@@ -59,5 +59,8 @@ c.JupyterHub.db_url='postgresql://postgres:{password}@{host}/{db}'.format(
 
 # Make it possible to add users via the admin panel
 c.LocalAuthenticator.create_system_users = True
-c.Authenticator.allowed_users={'kyle'}
-c.Authenticator.admin_users={'kyle'}
+c.Authenticator.admin_access = True
+c.JupyterHub.authenticator_class = "oauthenticator.GitHubOAuthenticator"
+c.GitHubOAuthenticator.oauth_callback_url = "https://<domain>.com/hub/oauth_callback"
+c.Authenticator.allowed_users={'kylrth'}
+c.Authenticator.admin_users={'kylrth'}
