@@ -105,6 +105,11 @@ USER $NB_USER
 ENV SHELL=/bin/bash \
     EDITOR=vim
 
+# rename the base kernel and give it a cool icon
+RUN sed -i 's|Python 3 (ipykernel)|base|' /opt/conda/share/jupyter/kernels/python3/kernel.json
+COPY torch_tf_32.png /opt/conda/share/jupyter/kernels/python3/logo-32x32.png
+COPY torch_tf_64.png /opt/conda/share/jupyter/kernels/python3/logo-64x64.png
+
 # install Pytorch (force CUDA version even if building with default runtime)
 RUN conda install --yes \
     pytorch=1.10.2=*cuda* \
@@ -141,8 +146,21 @@ RUN conda install --yes \
     tqdm \
     wheel
 
-RUN conda build purge-all
+# We'll install geopandas in a separate env because its dependencies are pretty different
+RUN conda create -n geopandas \
+    ipykernel \
+    geopandas=0.10.2 \
+    pandas \
+    pandarallel \
+    scikit-image \
+    scikit-learn \
+    scipy \
+    matplotlib
+RUN conda run -n geopandas ipython kernel install --user --name=geopandas
+COPY geopandas_32.png /home/deep/.local/share/jupyter/kernels/geopandas/logo-32x32.png
+COPY geopandas_64.png /home/deep/.local/share/jupyter/kernels/geopandas/logo-64x64.png
 
+RUN conda build purge-all
 RUN conda init bash
 
 # import matplotlib the first time to build the font cache

@@ -87,9 +87,12 @@ RUN cd /tmp && \
 
 # install necessary Jupyter components
 RUN conda install -y \
-    'python'  \
-    'notebook=6.4.8' \
-    'jupyterhub=2.0.1' \
-    'jupyterlab=3.2.9' \
-    'jupyter' \
-    'six'
+    python \
+    notebook=6.4.8 \
+    jupyterhub=2.0.1 \
+    jupyterlab=3.2.9 \
+    jupyter \
+    six
+
+# create the .jupyter/lab dir so that when we mount user settings it doesn't create this dir as root
+RUN mkdir -p /home/$NB_USER/.jupyter/lab
