@@ -52,8 +52,9 @@ RUN useradd -m -s /bin/bash -N -u $NB_UID $NB_USER && \
     chown $NB_USER:$NB_GID $CONDA_DIR && \
     fix-permissions /home/$NB_USER && \
     fix-permissions $CONDA_DIR
-RUN usermod -aG sudo $NB_USER
 RUN rm /usr/local/bin/fix-permissions
+RUN usermod -aG sudo $NB_USER
+RUN echo "deep:changeme" | chpasswd
 USER $NB_USER
 
 # configure container startup
