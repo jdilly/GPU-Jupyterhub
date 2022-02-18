@@ -88,8 +88,8 @@ RUN cd /tmp && \
 # install necessary Jupyter components
 RUN conda install -y \
     'python'  \
-    'notebook=6.4.6' \
+    'notebook=6.4.8' \
     'jupyterhub=2.0.1' \
-    'jupyterlab=3.2.1' \
+    'jupyterlab=3.2.9' \
     'jupyter' \
     'six'

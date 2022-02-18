@@ -89,7 +89,7 @@ ARG NB_USER=deep \
 USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
-ARG GOVERSION=1.17.5
+ARG GOVERSION=1.17.7
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -107,7 +107,7 @@ ENV SHELL=/bin/bash \
 
 # install Pytorch (force CUDA version even if building with default runtime)
 RUN conda install --yes \
-    pytorch=1.10.1=*cuda* \
+    pytorch=1.10.2=*cuda* \
     cudatoolkit=11.3.1 \
     -c pytorch -c nvidia
 # install TensorFlow
@@ -115,10 +115,10 @@ RUN conda install --yes \
     tensorflow-gpu=2.6.0
 # version other important data science packages
 RUN conda install --yes \
-    scikit-image=0.18.3 \
-    scikit-learn=1.0.1 \
-    scipy=1.7.1 \
-    matplotlib=3.5.0
+    scikit-image=0.19.1 \
+    scikit-learn=1.0.2 \
+    scipy=1.8.0 \
+    matplotlib=3.5.1
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
 RUN conda install --yes \
@@ -131,6 +131,7 @@ RUN conda install --yes \
     nose \
     numpy \
     pandas \
+    pandarallel \
     path.py \
     Pillow \
     pyyaml \
