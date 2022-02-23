@@ -173,4 +173,6 @@ USER root
 RUN rm -rf /tmp/* /var/tmp/*
 USER $NB_USER
 
+COPY README.md /home/$NB_USER/README.md
+
 EXPOSE 5000 6006
