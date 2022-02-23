@@ -133,6 +133,7 @@ RUN conda install --yes \
     h5py \
     ipykernel \
     ipython \
+    nltk \
     nose \
     numpy \
     pandas \
