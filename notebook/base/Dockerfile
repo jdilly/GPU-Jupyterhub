@@ -14,13 +14,16 @@ RUN apt-get update && \
 
 RUN apt-get update && apt-get -yq dist-upgrade
 RUN apt-get install -yq --no-install-recommends \
-    wget \
     bzip2 \
     ca-certificates \
-    sudo \
-    locales \
+    curl \
     fonts-liberation \
-    curl
+    locales \
+    man \
+    manpages-posix \
+    sudo \
+    wget
+RUN yes | unminimize
 
 RUN echo "en_US.UTF-8 UTF-8" > /etc/locale.gen && locale-gen
 ENV LC_ALL=en_US.UTF-8 \
