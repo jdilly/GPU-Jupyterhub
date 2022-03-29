@@ -1,17 +1,9 @@
-# Copyright (c) Jupyter Development Team.
-# Distributed under the terms of the Modified BSD License.
-
-# JupyterHub docker-compose configuration file
-version: "2.3"
+version: "3.9"
 
 services:
   jupyter:
-    build:
-      context: .
-    image: jupyterhub
+    image: jupyterhub:latest
     container_name: jupyterhub  # necessary so spawned containers can reach hub
-    depends_on:
-      - jupyter-db
     restart: unless-stopped
     runtime: nvidia
     volumes:
@@ -32,26 +24,10 @@ services:
       # specify how GPUs are exposed to containers
       NVIDIA_VISIBLE_DEVICES: all
       NVIDIA_DRIVER_CAPABILITIES: compute,utility
-      # Postgres db info
-      POSTGRES_DB: jupyterhub
-      POSTGRES_HOST: jupyterhub-db
-      # use `openssl rand -hex 32` to generate, and copy it down below
-      POSTGRES_PASSWORD: changeme
       GITHUB_CLIENT_ID: changeme
       GITHUB_CLIENT_SECRET: changeme
     command: >
       jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
-  jupyter-db:
-    image: postgres:9.5
-    restart: unless-stopped
-    container_name: jupyterhub-db
-    networks:
-      - jupyter-network
-    environment:
-      POSTGRES_DB: jupyterhub
-      POSTGRES_PASSWORD: changeme
-    volumes:
-      - "jupyter-db:/var/lib/postgresql/data"
 
 networks:
   default:
@@ -59,4 +35,3 @@ networks:
     name: jupyter-network  # specified so that spawned containers can join
 volumes:
   jupyter-data:
-  jupyter-db:

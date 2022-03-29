@@ -51,11 +51,7 @@ c.JupyterHub.bind_url = 'http://:80'
 
 c.JupyterHub.cookie_secret_file = "/data/jupyterhub_cookie_secret"
 
-c.JupyterHub.db_url='postgresql://postgres:{password}@{host}/{db}'.format(
-    host = os.environ['POSTGRES_HOST'],
-    password = os.environ['POSTGRES_PASSWORD'],
-    db = os.environ['POSTGRES_DB'],
-)
+c.JupyterHub.db_url = "sqlite:////data/jupyterhub.sqlite"
 
 # Make it possible to add users via the admin panel
 c.LocalAuthenticator.create_system_users = True
