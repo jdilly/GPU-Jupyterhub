@@ -76,6 +76,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     unzip \
     vim \
     yasm \
+    zip \
     zlib1g-dev
 
 RUN apt-get autoremove -y && \
@@ -89,7 +90,7 @@ ARG NB_USER=deep \
 USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
-ARG GOVERSION=1.17.7
+ARG GOVERSION=1.18
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -112,15 +113,17 @@ COPY torch_tf_64.png /opt/conda/share/jupyter/kernels/python3/logo-64x64.png
 
 # install Pytorch (force CUDA version even if building with default runtime)
 RUN conda install --yes \
-    pytorch=1.10.2=*cuda* \
-    cudatoolkit=11.3.1 \
+    pytorch=1.11.0=*cuda* \
+    torchvision=0.12.0 \
+    torchaudio=0.11.0 \
+    cudatoolkit=11.4.1 \
     -c pytorch -c nvidia
 # install TensorFlow
 RUN conda install --yes \
-    tensorflow-gpu=2.6.0
+    tensorflow-gpu=2.7.0
 # version other important data science packages
 RUN conda install --yes \
-    scikit-image=0.19.1 \
+    scikit-image=0.19.2 \
     scikit-learn=1.0.2 \
     scipy=1.8.0 \
     matplotlib=3.5.1

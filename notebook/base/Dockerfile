@@ -74,12 +74,12 @@ ENV LD_LIBRARY_PATH /usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV LIBRARY_PATH $LD_LIBRARY_PATH
 
 # install conda as non-root user
-ARG MINICONDA_VERSION=py39_4.10.3
-ARG MINICONDA_SUM=1ea2f885b4dbc3098662845560bc64271eb17085387a70c2ba3f29fff6f8d52f
+ARG MINICONDA_VERSION=py39_4.11.0
+ARG MINICONDA_SUM=4e2f31e0b2598634c80daa12e4981647
 ENV PATH=$CONDA_DIR/bin:$PATH
 RUN cd /tmp && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
-    echo "${MINICONDA_SUM} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | sha256sum -c - && \
+    echo "${MINICONDA_SUM} *Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh" | md5sum -c - && \
     /bin/bash Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh -f -b -p $CONDA_DIR && \
     rm Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
     conda config --system --prepend channels conda-forge && \
@@ -91,9 +91,9 @@ RUN cd /tmp && \
 # install necessary Jupyter components
 RUN conda install -y \
     python \
-    notebook=6.4.8 \
-    jupyterhub=2.0.1 \
-    jupyterlab=3.2.9 \
+    notebook=6.4.10 \
+    jupyterhub=2.2.2 \
+    jupyterlab=3.3.2 \
     jupyter \
     six
 
