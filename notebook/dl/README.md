@@ -2,6 +2,14 @@
 
 Welcome! The first thing you should know is that this environment is running inside of a Docker container, and when you stop your server you destroy the container. If you want your files to persist, they need to go in `~/persistent`. That directory is stored on the host server's SSD, which is fast but has limited storage. There is also `~/shared`, which is stored on an optical disk. Everyone who uses Jupyter here can see files in `~/shared`.
 
+You can view disk usage by running `df -h /` for the SSD and `df -h ~/shared` for the optical disk.
+
+Backups are taken of `~/persistent` every 24 hours at 08h15 UTC. `~/shared` is NOT backed up.
+
+## Netdata
+
+[Netdata](https://www.netdata.cloud/) is a monitoring tool that will let you see detailed statistics on things like CPU/GPU usage, RAM, disk I/O, etc. You can view it by visiting [netdata.kylrth.com](https://netdata.kylrth.com/).
+
 ## Python kernels
 
 There are two Conda environments pre-installed in the container, `base` and `geopandas`. `base` has standard deep learning and data science libraries like PyTorch, TensorFlow, Pandas, and NLTK. You can make whatever changes you like to these environments, but remember that the changes will be lost when you restart your Jupyter Lab server.
