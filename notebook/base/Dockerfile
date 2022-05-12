@@ -9,6 +9,10 @@ USER root
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Nvidia has rotated their GPG keys since this image was created.
+RUN apt-key del 7fa2af80 && \
+    apt-key adv --fetch-keys https://developer.download.nvidia.com/compute/cuda/repos/ubuntu2004/x86_64/3bf863cc.pub
+
 RUN apt-get update && \
     apt-get install -yq software-properties-common
 
