@@ -60,12 +60,6 @@ RUN usermod -aG sudo $NB_USER
 RUN echo "deep:changeme" | chpasswd
 USER $NB_USER
 
-# configure container startup
-ENTRYPOINT ["tini", "--"]
-CMD ["start-notebook.sh"]
-EXPOSE 8888
-WORKDIR /home/$NB_USER
-
 # configure environment for CUDA
 ENV CUDA_HOME /usr/local/cuda-11.4
 ENV LD_LIBRARY_PATH /usr/local/cuda-11.4:/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH
@@ -91,11 +85,17 @@ RUN cd /tmp && \
 # install necessary Jupyter components
 RUN conda install -y \
     python \
-    notebook=6.4.10 \
-    jupyterhub=2.2.2 \
-    jupyterlab=3.3.2 \
+    notebook=6.4.11 \
+    jupyterhub=2.3.0 \
+    jupyterlab=3.4.0 \
     jupyter \
     six
 
 # create the .jupyter/lab dir so that when we mount user settings it doesn't create this dir as root
 RUN mkdir -p /home/$NB_USER/.jupyter/lab
+
+# configure container startup
+ENTRYPOINT ["tini", "--"]
+CMD ["start-notebook.sh"]
+EXPOSE 8888
+WORKDIR /home/$NB_USER

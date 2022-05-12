@@ -90,7 +90,7 @@ ARG NB_USER=deep \
 USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
-ARG GOVERSION=1.18
+ARG GOVERSION=1.18.2
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -100,8 +100,8 @@ RUN cd /home/$NB_USER/update-golang && sed -i 's|$SUDO_USER|'"$NB_USER"'|' updat
 RUN cd /home/$NB_USER/update-golang && sed -i 's|$SUDO_UID|'"$NB_UID"'|' update-golang.sh
 RUN cd /home/$NB_USER/update-golang && sed -i 's|$SUDO_GID|'"$NB_GID"'|' update-golang.sh
 RUN cd /home/$NB_USER/update-golang && RELEASE=$GOVERSION ./update-golang.sh -declutter
-RUN cd /home/$NB_USER/update-golang && git reset --hard
 USER $NB_USER
+RUN cd /home/$NB_USER/update-golang && git reset --hard
 
 ENV SHELL=/bin/bash \
     EDITOR=vim
@@ -119,19 +119,21 @@ RUN conda install --yes \
     cudatoolkit=11.4.1 \
     -c pytorch -c nvidia
 # install TensorFlow
-RUN conda install --yes \
-    tensorflow-gpu=2.7.0
+RUN pip install --no-cache-dir \
+  tensorflow-gpu==2.8.0 \
+  tensorboard==2.8.0
 # version other important data science packages
 RUN conda install --yes \
     scikit-image=0.19.2 \
     scikit-learn=1.0.2 \
     scipy=1.8.0 \
-    matplotlib=3.5.1
+    matplotlib=3.5.2
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
 RUN conda install --yes \
     black \
     Cython \
+    cupy \
     Flask \
     h5py \
     ipykernel \
@@ -143,12 +145,20 @@ RUN conda install --yes \
     pandarallel \
     path.py \
     Pillow \
+    protobuf \
     pyyaml \
     seaborn \
+    sentencepiece \
     setuptools \
+    spacy \
     statsmodels \
+    tensorboard \
     tqdm \
+    transformers \
     wheel
+
+# # to get the lab extension working with lab v3, we have to install directly from git
+RUN pip install --no-cache-dir git+https://github.com/twalcari/jupyterlab_tensorboard.git
 
 # We'll install geopandas in a separate env because its dependencies are pretty different
 RUN conda create -n geopandas \
