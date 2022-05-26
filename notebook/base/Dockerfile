@@ -72,8 +72,8 @@ ENV LD_LIBRARY_PATH /usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV LIBRARY_PATH $LD_LIBRARY_PATH
 
 # install conda as non-root user
-ARG MINICONDA_VERSION=py39_4.11.0
-ARG MINICONDA_SUM=4e2f31e0b2598634c80daa12e4981647
+ARG MINICONDA_VERSION=py39_4.12.0
+ARG MINICONDA_SUM=7843dd7d0a2c53b0df37ca8189672992
 ENV PATH=$CONDA_DIR/bin:$PATH
 RUN cd /tmp && \
     wget --quiet https://repo.anaconda.com/miniconda/Miniconda3-${MINICONDA_VERSION}-Linux-x86_64.sh && \
@@ -91,7 +91,7 @@ RUN conda install -y \
     python \
     notebook=6.4.11 \
     jupyterhub=2.3.0 \
-    jupyterlab=3.4.0 \
+    jupyterlab=3.4.2 \
     jupyter \
     six
 

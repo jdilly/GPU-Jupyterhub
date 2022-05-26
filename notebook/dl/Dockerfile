@@ -120,13 +120,13 @@ RUN conda install --yes \
     -c pytorch -c nvidia
 # install TensorFlow
 RUN pip install --no-cache-dir \
-  tensorflow-gpu==2.8.0 \
-  tensorboard==2.8.0
+  tensorflow-gpu==2.9.1 \
+  tensorboard==2.9.0
 # version other important data science packages
 RUN conda install --yes \
     scikit-image=0.19.2 \
-    scikit-learn=1.0.2 \
-    scipy=1.8.0 \
+    scikit-learn=1.1.1 \
+    scipy=1.8.1 \
     matplotlib=3.5.2
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
