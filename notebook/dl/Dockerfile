@@ -90,7 +90,7 @@ ARG NB_USER=deep \
 USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
-ARG GOVERSION=1.18.2
+ARG GOVERSION=1.18.3
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -121,10 +121,10 @@ RUN conda install --yes \
 # install TensorFlow
 RUN pip install --no-cache-dir \
   tensorflow-gpu==2.9.1 \
-  tensorboard==2.9.0
+  tensorboard==2.9.1
 # version other important data science packages
 RUN conda install --yes \
-    scikit-image=0.19.2 \
+    scikit-image=0.19.3 \
     scikit-learn=1.1.1 \
     scipy=1.8.1 \
     matplotlib=3.5.2
