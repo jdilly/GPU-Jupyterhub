@@ -87,7 +87,7 @@ RUN conda install -y \
     python \
     notebook=6.4.12 \
     jupyterhub=2.3.1 \
-    jupyterlab=3.4.3 \
+    jupyterlab=3.4.5 \
     jupyter \
     six
 

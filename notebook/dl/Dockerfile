@@ -90,7 +90,7 @@ ARG NB_USER=deep \
 USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
-ARG GOVERSION=1.18.3
+ARG GOVERSION=1.19
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -113,21 +113,15 @@ COPY torch_tf_64.png /opt/conda/share/jupyter/kernels/python3/logo-64x64.png
 
 # install Pytorch (force CUDA version even if building with default runtime)
 RUN conda install --yes \
-    pytorch=1.11.0=*cuda* \
-    torchvision=0.12.0 \
-    torchaudio=0.11.0 \
-    cudatoolkit=11.4.1 \
+    pytorch=1.12.1=*cuda* \
+    torchvision=0.13.1 \
+    torchaudio=0.12.1 \
+    cudatoolkit=11.3.1 \
     -c pytorch -c nvidia
 # install TensorFlow
 RUN pip install --no-cache-dir \
   tensorflow-gpu==2.9.1 \
-  tensorboard==2.9.1
-# version other important data science packages
-RUN conda install --yes \
-    scikit-image=0.19.3 \
-    scikit-learn=1.1.1 \
-    scipy=1.8.1 \
-    matplotlib=3.5.2
+  tensorboard
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
 RUN conda install --yes \
@@ -138,6 +132,7 @@ RUN conda install --yes \
     h5py \
     ipykernel \
     ipython \
+    matplotlib \
     nltk \
     nose \
     numpy \
@@ -147,6 +142,9 @@ RUN conda install --yes \
     Pillow \
     protobuf \
     pyyaml \
+    scikit-image \
+    scikit-learn \
+    scipy \
     seaborn \
     sentencepiece \
     setuptools \
@@ -163,7 +161,7 @@ RUN pip install --no-cache-dir git+https://github.com/twalcari/jupyterlab_tensor
 # We'll install geopandas in a separate env because its dependencies are pretty different
 RUN conda create -n geopandas \
     ipykernel \
-    geopandas=0.10.2 \
+    geopandas=0.11.1 \
     pandas \
     pandarallel \
     scikit-image \
