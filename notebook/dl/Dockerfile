@@ -91,6 +91,7 @@ USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
 # https://go.dev/dl/
+ARG GOVERSION=1.19.1
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -110,6 +111,7 @@ ENV SHELL=/bin/bash \
 RUN sed -i 's|Python 3 (ipykernel)|base|' /opt/conda/share/jupyter/kernels/python3/kernel.json
 COPY torch_tf_32.png /opt/conda/share/jupyter/kernels/python3/logo-32x32.png
 COPY torch_tf_64.png /opt/conda/share/jupyter/kernels/python3/logo-64x64.png
+RUN rm /opt/conda/share/jupyter/kernels/python3/logo-svg.svg
 
 # install Pytorch (force CUDA version even if building with default runtime)
 # https://pytorch.org/get-started/locally/
@@ -126,7 +128,7 @@ RUN conda install --yes \
 # install TensorFlow
 # https://pypi.org/project/tensorflow-gpu/
 RUN pip install --no-cache-dir \
-  tensorflow-gpu==2.9.1 \
+  tensorflow-gpu==2.10.0 \
   tensorboard
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
@@ -178,6 +180,7 @@ RUN conda create -n geopandas \
 RUN conda run -n geopandas ipython kernel install --user --name=geopandas
 COPY geopandas_32.png /home/deep/.local/share/jupyter/kernels/geopandas/logo-32x32.png
 COPY geopandas_64.png /home/deep/.local/share/jupyter/kernels/geopandas/logo-64x64.png
+RUN rm /home/deep/.local/share/jupyter/kernels/geopandas/logo-svg.svg
 
 RUN conda build purge-all
 RUN conda init bash

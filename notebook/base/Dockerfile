@@ -1,7 +1,7 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-FROM nvidia/cuda:11.4.2-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04
 
 MAINTAINER Kyle Roth <kylrth@gmail.com>
 
@@ -89,8 +89,8 @@ RUN cd /tmp && \
 RUN conda install -y \
     python \
     notebook=6.4.12 \
-    jupyterhub=2.3.1 \
-    jupyterlab=3.4.5 \
+    jupyterhub=3.0.0 \
+    jupyterlab=3.4.7 \
     jupyter \
     six
 
