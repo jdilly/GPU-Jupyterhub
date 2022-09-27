@@ -90,7 +90,7 @@ ARG NB_USER=deep \
 USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
-ARG GOVERSION=1.19
+# https://go.dev/dl/
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
@@ -112,6 +112,11 @@ COPY torch_tf_32.png /opt/conda/share/jupyter/kernels/python3/logo-32x32.png
 COPY torch_tf_64.png /opt/conda/share/jupyter/kernels/python3/logo-64x64.png
 
 # install Pytorch (force CUDA version even if building with default runtime)
+# https://pytorch.org/get-started/locally/
+# https://anaconda.org/pytorch/pytorch
+# https://anaconda.org/pytorch/torchvision
+# https://anaconda.org/pytorch/torchaudio
+# https://anaconda.org/nvidia/cudatoolkit/files
 RUN conda install --yes \
     pytorch=1.12.1=*cuda* \
     torchvision=0.13.1 \
@@ -119,6 +124,7 @@ RUN conda install --yes \
     cudatoolkit=11.3.1 \
     -c pytorch -c nvidia
 # install TensorFlow
+# https://pypi.org/project/tensorflow-gpu/
 RUN pip install --no-cache-dir \
   tensorflow-gpu==2.9.1 \
   tensorboard
@@ -159,6 +165,7 @@ RUN conda install --yes \
 RUN pip install --no-cache-dir git+https://github.com/twalcari/jupyterlab_tensorboard.git
 
 # We'll install geopandas in a separate env because its dependencies are pretty different
+# https://anaconda.org/conda-forge/geopandas
 RUN conda create -n geopandas \
     ipykernel \
     geopandas=0.11.1 \

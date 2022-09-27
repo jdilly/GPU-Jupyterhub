@@ -31,6 +31,7 @@ ENV LC_ALL=en_US.UTF-8 \
     LANGUAGE=en_US.UTF-8
 
 # Install Tini
+# https://github.com/krallin/tini/releases
 ARG TINI_VERSION=0.19.0
 ARG TINI_SHA256=93dcc18adc78c65a028a84799ecf8ad40c936fdfc5f2a57b1acda5a8117fa82c
 RUN wget --quiet https://github.com/krallin/tini/releases/download/v${TINI_VERSION}/tini && \
@@ -83,6 +84,8 @@ RUN cd /tmp && \
     conda install --yes conda-build && conda build purge-all
 
 # install necessary Jupyter components
+# https://anaconda.org/conda-forge/notebook
+# https://anaconda.org/conda-forge/jupyterhub
 RUN conda install -y \
     python \
     notebook=6.4.12 \
