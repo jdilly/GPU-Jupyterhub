@@ -86,11 +86,12 @@ RUN cd /tmp && \
 # install necessary Jupyter components
 # https://anaconda.org/conda-forge/notebook
 # https://anaconda.org/conda-forge/jupyterhub
+# https://anaconda.org/conda-forge/jupyterlab
 RUN conda install -y \
     python \
     notebook=6.4.12 \
     jupyterhub=3.0.0 \
-    jupyterlab=3.4.7 \
+    jupyterlab=3.4.8 \
     jupyter \
     six
 

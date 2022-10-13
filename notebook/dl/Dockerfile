@@ -91,7 +91,7 @@ USER $NB_USER
 
 # install Go and leave the update-golang.sh command available for the user
 # https://go.dev/dl/
-ARG GOVERSION=1.19.1
+ARG GOVERSION=1.19.2
 RUN git clone https://github.com/udhos/update-golang
 USER root
 RUN cd /home/$NB_USER/update-golang && sed -i 's|wget -O|wget --quiet -O|' update-golang.sh
