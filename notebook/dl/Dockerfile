@@ -3,7 +3,7 @@
 
 FROM base-notebook-gpu
 
-MAINTAINER Kyle Roth <kylrth@gmail.com>
+MAINTAINER Jason Dillman <jasondillman22@gmail.com>
 
 USER root
 
@@ -119,16 +119,17 @@ RUN rm /opt/conda/share/jupyter/kernels/python3/logo-svg.svg
 # https://anaconda.org/pytorch/torchvision
 # https://anaconda.org/pytorch/torchaudio
 # https://anaconda.org/nvidia/cudatoolkit/files
-RUN conda install --yes \
-    pytorch=1.12.1=*cuda* \
-    torchvision=0.13.1 \
-    torchaudio=0.12.1 \
-    cudatoolkit=11.3.1 \
-    -c pytorch -c nvidia
+# RUN conda install --yes \
+#    pytorch=1.12.1=*cuda* \
+#    torchvision=0.13.1 \
+#    torchaudio=0.12.1 \
+#    cudatoolkit=11.3.1 \
+#    -c pytorch -c nvidia
+
 # install TensorFlow
 # https://pypi.org/project/tensorflow-gpu/
 RUN pip install --no-cache-dir \
-  tensorflow-gpu==2.10.0 \
+  tensorflow-gpu==2.17.0 \
   tensorboard
 # no need to version these other things, but we will add them after the others so we get the latest
 # when the cache is busted
