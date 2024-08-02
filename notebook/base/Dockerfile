@@ -1,9 +1,9 @@
 # Copyright (c) Jupyter Development Team.
 # Distributed under the terms of the Modified BSD License.
 
-FROM nvidia/cuda:11.4.3-cudnn8-devel-ubuntu20.04
+FROM nvidia/cuda:12.2.2-cudnn8-runtime-ubuntu22.04
 
-MAINTAINER Kyle Roth <kylrth@gmail.com>
+MAINTAINER Jason Dillman <jasondillman22@gmail.com>
 
 USER root
 
@@ -62,8 +62,8 @@ RUN echo "deep:changeme" | chpasswd
 USER $NB_USER
 
 # configure environment for CUDA
-ENV CUDA_HOME /usr/local/cuda-11.4
-ENV LD_LIBRARY_PATH /usr/local/cuda-11.4:/usr/local/cuda-11.4/lib64:$LD_LIBRARY_PATH
+ENV CUDA_HOME /usr/local/cuda-12.2
+ENV LD_LIBRARY_PATH /usr/local/cuda-12.2:/usr/local/cuda-12.2/lib64:$LD_LIBRARY_PATH
 # CUPTI libs were moved to /usr/local/cuda/lib64
 ENV LD_LIBRARY_PATH /usr/local/cuda/lib64:$LD_LIBRARY_PATH
 ENV LIBRARY_PATH $LD_LIBRARY_PATH
